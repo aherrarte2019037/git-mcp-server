@@ -3,8 +3,15 @@ Anthropic API client for the chatbot
 """
 import anthropic
 from typing import List, Dict, Any
-from ..config import ANTHROPIC_API_KEY
-from ..utils import log_mcp_interaction
+import os
+import logging
+
+# Get API key from environment
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+
+def log_mcp_interaction(action, data):
+    """Simple logging function"""
+    logging.info(f"MCP {action}: {data}")
 
 class AnthropicClient:
     def __init__(self):

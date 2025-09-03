@@ -33,30 +33,20 @@
 
 ### 3. Running the Project
 
-1. **Run the demo** (recommended for first time):
-   ```bash
-   python demo.py
-   ```
-
-2. **Run interactive mode**:
-   ```bash
-   python demo.py --interactive
-   ```
-
-3. **Run the chatbot directly**:
-   ```bash
-   python main.py
-   ```
+**Run the chatbot**:
+```bash
+python main.py
+```
 
 ### 4. Testing the Installation
 
-The demo script will:
-- Create a temporary repository
+The chatbot will:
+- Initialize all MCP servers
+- Provide interactive interface
 - Test all MCP server functionality
 - Display results
-- Clean up temporary files
 
-If the demo runs successfully, your installation is complete!
+If the chatbot starts successfully, your installation is complete!
 
 ### 5. Troubleshooting
 
@@ -117,13 +107,13 @@ Once running, you can use these commands:
 ### 8. Getting Help
 
 - Check the main README.md for detailed documentation
-- Run the demo script to see all functionality
+- Run the chatbot to see all functionality
 - Check the logs in `mcp_interactions.log` for debugging
 
 ### 9. Next Steps
 
 After successful setup:
-1. Try the interactive demo
+1. Try the interactive chatbot
 2. Test with your own repositories
 3. Explore the code to understand the implementation
 4. Check the MCP server specifications in `docs/`

@@ -4,7 +4,11 @@ Filesystem MCP Server Client
 import os
 import json
 from typing import Dict, Any, List
-from ..utils import log_mcp_interaction
+import logging
+
+def log_mcp_interaction(action, data):
+    """Simple logging function"""
+    logging.info(f"MCP {action}: {data}")
 
 class FilesystemMCPClient:
     def __init__(self, base_path: str = "."):

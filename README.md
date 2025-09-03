@@ -61,20 +61,10 @@ This project implements a chatbot that integrates multiple MCP servers to provid
 
 ### Quick Start
 
-1. **Run the demo**:
-   ```bash
-   python demo.py
-   ```
-
-2. **Run interactive mode**:
-   ```bash
-   python demo.py --interactive
-   ```
-
-3. **Run the chatbot directly**:
-   ```bash
-   python main.py
-   ```
+**Run the chatbot**:
+```bash
+python main.py
+```
 
 ### Available Commands
 
@@ -187,19 +177,16 @@ report = analyzer.generate_report(format="text")
 print(report['data'])
 ```
 
-## 📊 Demo Scenarios
+## 📊 Usage Scenarios
 
-### Scenario 1: Complete Repository Workflow
-The demo script (`demo.py`) demonstrates:
+### Complete Repository Workflow
+The chatbot can demonstrate:
 1. Initialize Git repository
-2. Create README.md and demo.py files
+2. Create files
 3. Add files to Git
-4. Create initial commit
+4. Create commits
 5. Analyze repository with Git Analyzer
-6. Generate comprehensive report
-
-### Scenario 2: Interactive Testing
-Run `python demo.py --interactive` to test individual commands and explore all functionality.
+6. Generate comprehensive reports
 
 ## 🔍 Logging
 
@@ -211,16 +198,16 @@ All MCP interactions are logged to `mcp_interactions.log` with detailed informat
 
 ## 🧪 Testing
 
-Run the demo to verify all functionality:
+Run the chatbot to verify all functionality:
 ```bash
-python demo.py
+python main.py
 ```
 
-The demo will:
-- Create a temporary repository
+The chatbot will:
+- Initialize all MCP servers
+- Provide interactive interface
 - Execute all MCP operations
 - Display results
-- Clean up temporary files
 
 ## 📝 API Integration
 

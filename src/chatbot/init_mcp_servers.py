@@ -4,7 +4,7 @@ Initialize MCP servers for the chatbot
 import sys
 import os
 
-# Add parent directory to path
+# Add src to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from mcp_servers.filesystem_client import FilesystemMCPClient

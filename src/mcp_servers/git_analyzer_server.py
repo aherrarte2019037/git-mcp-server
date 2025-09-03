@@ -6,7 +6,11 @@ import subprocess
 import json
 from datetime import datetime
 from typing import Dict, Any, List
-from ..utils import log_mcp_interaction
+import logging
+
+def log_mcp_interaction(action, data):
+    """Simple logging function"""
+    logging.info(f"MCP {action}: {data}")
 
 class GitAnalyzerMCPServer:
     def __init__(self, base_path: str = "."):

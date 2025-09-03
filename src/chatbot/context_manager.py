@@ -2,7 +2,7 @@
 Context manager for maintaining conversation history
 """
 from typing import List, Dict, Any
-from ..utils import log_mcp_interaction
+import logging
 
 class ContextManager:
     def __init__(self, max_context_length: int = 10):
@@ -27,10 +27,8 @@ class ContextManager:
         if len(self.context) > self.max_context_length * 2:  # *2 because we store both user and assistant messages
             self.context = self.context[-self.max_context_length * 2:]
         
-        log_mcp_interaction("context_update", {
-            "context_length": len(self.context),
-            "user_message": user_message[:100] + "..." if len(user_message) > 100 else user_message
-        })
+        # Log context update
+        logging.info(f"Context updated: {len(self.context)} messages")
     
     def get_context(self) -> List[Dict[str, str]]:
         """
@@ -44,7 +42,7 @@ class ContextManager:
     def clear_context(self):
         """Clear the conversation context"""
         self.context = []
-        log_mcp_interaction("context_clear", {})
+        logging.info("Context cleared")
     
     def get_context_summary(self) -> str:
         """

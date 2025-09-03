@@ -4,15 +4,15 @@ Main chatbot application
 import sys
 import os
 from typing import List, Dict, Any
-from anthropic_client import AnthropicClient
-from context_manager import ContextManager
-from ..utils import setup_logging, log_mcp_interaction
+from .anthropic_client import AnthropicClient
+from .context_manager import ContextManager
+import logging
 
 class Chatbot:
     def __init__(self):
         self.anthropic_client = AnthropicClient()
         self.context_manager = ContextManager()
-        self.logger = setup_logging()
+        self.logger = logging.getLogger(__name__)
         self.mcp_servers = {}  # Will store MCP server clients
         
     def add_mcp_server(self, name: str, server_client):
@@ -24,7 +24,7 @@ class Chatbot:
             server_client: MCP server client instance
         """
         self.mcp_servers[name] = server_client
-        log_mcp_interaction("mcp_server_added", {"server_name": name})
+        self.logger.info(f"MCP server added: {name}")
     
     def process_message(self, user_input: str) -> str:
         """
@@ -292,7 +292,7 @@ def main():
         chatbot = Chatbot()
         
         # Initialize MCP servers
-        from init_mcp_servers import initialize_mcp_servers
+        from .init_mcp_servers import initialize_mcp_servers
         initialize_mcp_servers(chatbot)
         
         chatbot.run_interactive()
