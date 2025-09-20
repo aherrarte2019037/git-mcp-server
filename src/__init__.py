@@ -1,1 +1,0 @@
-# Git MCP Server Project

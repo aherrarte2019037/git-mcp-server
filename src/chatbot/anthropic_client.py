@@ -4,7 +4,7 @@ Anthropic API client for the chatbot
 import anthropic
 from typing import List, Dict, Any
 import logging
-import config
+import os
 
 def log_mcp_interaction(action, data):
     """Simple logging function"""
@@ -12,10 +12,11 @@ def log_mcp_interaction(action, data):
 
 class AnthropicClient:
     def __init__(self):
-        if not config.ANTHROPIC_API_KEY:
-            raise ValueError("ANTHROPIC_API_KEY is required")
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
         
-        self.client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+        self.client = anthropic.Anthropic(api_key=api_key)
         self.model = "claude-sonnet-4-20250514"
     
     def send_message(self, message: str, context: List[Dict[str, str]] = None) -> str:
@@ -63,3 +64,9 @@ class AnthropicClient:
             error_msg = f"Error calling Anthropic API: {str(e)}"
             log_mcp_interaction("anthropic_error", {"error": error_msg})
             return f"Sorry, I encountered an error: {error_msg}"
+    
+    async def get_response(self, message: str, context: List[Dict[str, str]] = None) -> str:
+        """
+        Async wrapper for send_message
+        """
+        return self.send_message(message, context)

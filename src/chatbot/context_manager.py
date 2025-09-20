@@ -9,6 +9,23 @@ class ContextManager:
         self.context: List[Dict[str, str]] = []
         self.max_context_length = max_context_length
     
+    def add_message(self, role: str, content: str):
+        """
+        Add a message to the context
+        
+        Args:
+            role: "user" or "assistant"
+            content: Message content
+        """
+        self.context.append({"role": role, "content": content})
+        
+        # Trim context if it gets too long
+        if len(self.context) > self.max_context_length * 2:  # *2 because we store both user and assistant messages
+            self.context = self.context[-self.max_context_length * 2:]
+        
+        # Log context update
+        logging.info(f"Context updated: {len(self.context)} messages")
+    
     def add_interaction(self, user_message: str, ai_response: str):
         """
         Add a user-AI interaction to the context
@@ -17,18 +34,8 @@ class ContextManager:
             user_message: User's message
             ai_response: AI's response
         """
-        # Add user message
-        self.context.append({"role": "user", "content": user_message})
-        
-        # Add AI response
-        self.context.append({"role": "assistant", "content": ai_response})
-        
-        # Trim context if it gets too long
-        if len(self.context) > self.max_context_length * 2:  # *2 because we store both user and assistant messages
-            self.context = self.context[-self.max_context_length * 2:]
-        
-        # Log context update
-        logging.info(f"Context updated: {len(self.context)} messages")
+        self.add_message("user", user_message)
+        self.add_message("assistant", ai_response)
     
     def get_context(self) -> List[Dict[str, str]]:
         """
