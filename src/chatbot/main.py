@@ -2,8 +2,6 @@
 Main chatbot application
 """
 import sys
-import os
-from typing import List, Dict, Any
 from .anthropic_client import AnthropicClient
 from .context_manager import ContextManager
 import logging
@@ -257,7 +255,7 @@ class Chatbot:
     
     def run_interactive(self):
         """Run the chatbot in interactive mode"""
-        print("🤖 Git MCP Chatbot - Type 'quit' to exit, 'clear' to clear context")
+        print("- Git MCP Chatbot - Type 'quit' to exit, 'clear' to clear context")
         print("=" * 60)
         
         while True:
@@ -278,7 +276,7 @@ class Chatbot:
                 
                 # Process and display bot response with background
                 response = self.process_message(user_input)
-                print(f"\n\033[42m🤖 Bot: {response}\033[0m")
+                print(f"\n🤖 Bot: {response}")
                 
             except KeyboardInterrupt:
                 print("\n👋 Goodbye!")

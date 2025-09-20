@@ -34,8 +34,7 @@ def initialize_mcp_servers(chatbot):
         chatbot.add_mcp_server('git_analyzer', git_analyzer)
         print("✅ Git Analyzer MCP server initialized")
         
-        print("\n🎉 All MCP servers initialized successfully!")
-        print("Available operations:")
+        print("\nAvailable operations:")
         print("- Filesystem: read file, list files, create file")
         print("- Git: init repository, add file, commit, git status")
         print("- Git Analyzer: analyze repository, commit stats, file stats, generate report")
