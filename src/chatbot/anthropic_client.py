@@ -3,11 +3,8 @@ Anthropic API client for the chatbot
 """
 import anthropic
 from typing import List, Dict, Any
-import os
 import logging
-
-# Get API key from environment
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+import config
 
 def log_mcp_interaction(action, data):
     """Simple logging function"""
@@ -15,11 +12,11 @@ def log_mcp_interaction(action, data):
 
 class AnthropicClient:
     def __init__(self):
-        if not ANTHROPIC_API_KEY:
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+        if not config.ANTHROPIC_API_KEY:
+            raise ValueError("ANTHROPIC_API_KEY is required")
         
-        self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        self.model = "claude-3-haiku-20240307"  # Using Haiku for cost efficiency
+        self.client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+        self.model = "claude-sonnet-4-20250514"
     
     def send_message(self, message: str, context: List[Dict[str, str]] = None) -> str:
         """
