@@ -276,9 +276,9 @@ class Chatbot:
                 if not user_input:
                     continue
                 
-                print("\n🤖 Bot: ", end="")
+                # Process and display bot response with background
                 response = self.process_message(user_input)
-                print(response)
+                print(f"\n\033[42m🤖 Bot: {response}\033[0m")
                 
             except KeyboardInterrupt:
                 print("\n👋 Goodbye!")
