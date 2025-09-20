@@ -4,14 +4,15 @@ Utility functions for the Git MCP Server project
 import logging
 import json
 from datetime import datetime
+import config
 
 def setup_logging():
     """Setup logging configuration"""
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=config.LOG_LEVEL,
+        format=config.LOG_FORMAT,
         handlers=[
-            logging.FileHandler('mcp_interactions.log'),
+            logging.FileHandler(config.LOG_FILE),
             logging.StreamHandler()
         ]
     )

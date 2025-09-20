@@ -7,9 +7,10 @@ import os
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
 # MCP Server Configuration
-MCP_SERVER_HOST = "localhost"
-MCP_SERVER_PORT = 8000
+MCP_SERVER_HOST = os.getenv("MCP_SERVER_HOST")
+MCP_SERVER_PORT = os.getenv("MCP_SERVER_PORT")
 
 # Logging Configuration
-LOG_LEVEL = "INFO"
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+LOG_LEVEL = os.getenv("MCP_LOG_LEVEL")
+LOG_FORMAT = os.getenv("MCP_LOG_FORMAT")
+LOG_FILE = os.getenv("MCP_LOG_FILE")
