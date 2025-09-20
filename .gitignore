@@ -1,3 +1,9 @@
+# Logs
+mcp_interactions.log
+
+# Environment variables
+.env
+
 # Python
 __pycache__/
 *.py[cod]
@@ -19,48 +25,18 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# Virtual Environment
+# Virtual environment
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-# Logs
-*.log
-mcp_interactions.log
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Temporary files
-*.tmp
-*.temp
-temp/
-tmp/
-
-# API Keys (security)
-api_keys.txt
-secrets.txt
