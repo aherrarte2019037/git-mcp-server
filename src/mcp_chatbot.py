@@ -14,20 +14,24 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
 from mcp_servers.mcp_client import MCPClient
+from mcp_servers.git_analyzer_client import GitAnalyzerClient
 from chatbot.anthropic_client import AnthropicClient
 from chatbot.context_manager import ContextManager
 from chatbot.intent_detector import IntentDetector
 from chatbot.filesystem_executor import FilesystemExecutor
 from chatbot.git_executor import GitExecutor
+from chatbot.git_analyzer_executor import GitAnalyzerExecutor
 
 class MCPChatbot:
     def __init__(self):
         self.mcp_client = MCPClient()
+        self.git_analyzer_client = GitAnalyzerClient()
         self.anthropic_client = AnthropicClient()
         self.context_manager = ContextManager()
         self.intent_detector = IntentDetector(self.anthropic_client)
         self.filesystem_executor = FilesystemExecutor(self.mcp_client)
         self.git_executor = GitExecutor(self.mcp_client)
+        self.git_analyzer_executor = GitAnalyzerExecutor(self.git_analyzer_client)
         self.logger = self._setup_logging()
         
     def _setup_logging(self):
@@ -57,6 +61,12 @@ class MCPChatbot:
                 self.logger.error("Failed to start Git server")
                 return False
             
+            # Start Git Analyzer server
+            analyzer_success = await self.git_analyzer_client.start_analyzer_server()
+            if not analyzer_success:
+                self.logger.error("Failed to start Git Analyzer server")
+                return False
+            
             self.logger.info("MCP servers initialized successfully")
             return True
         except Exception as e:
@@ -72,12 +82,12 @@ class MCPChatbot:
             # Get context for AI
             context = self.context_manager.get_context()
             
-            # Check if message contains filesystem intent using LLM
-            filesystem_intent = await self.intent_detector.detect_filesystem_intent(user_message)
+            # Check if message contains Git Analyzer intent using LLM (most specific first)
+            git_analyzer_intent = await self.intent_detector.detect_git_analyzer_intent(user_message)
             
-            if filesystem_intent:
-                response = await self.filesystem_executor.execute_filesystem_intent(filesystem_intent, user_message)
-                # Add filesystem response to context
+            if git_analyzer_intent:
+                response = await self.git_analyzer_executor.execute_git_analyzer_intent(git_analyzer_intent, user_message)
+                # Add Git Analyzer response to context
                 self.context_manager.add_message("assistant", response)
                 return response
             
@@ -87,6 +97,15 @@ class MCPChatbot:
             if git_intent:
                 response = await self.git_executor.execute_git_intent(git_intent, user_message)
                 # Add Git response to context
+                self.context_manager.add_message("assistant", response)
+                return response
+            
+            # Check if message contains filesystem intent using LLM (least specific last)
+            filesystem_intent = await self.intent_detector.detect_filesystem_intent(user_message)
+            
+            if filesystem_intent:
+                response = await self.filesystem_executor.execute_filesystem_intent(filesystem_intent, user_message)
+                # Add filesystem response to context
                 self.context_manager.add_message("assistant", response)
                 return response
             
@@ -109,14 +128,21 @@ class MCPChatbot:
         print("- list files / ls")
         print("- read file <path>")
         print("- write file <path> <content>")
-        print("📚 Git MCP Commands:")
+        print("\n📚 Git MCP Commands:")
         print("- git status")
         print("- git add <files>")
         print("- git commit <message>")
         print("- git log")
         print("- git init")
         print("- git branch")
-        print("💬 General Conversation:")
+        print("\n🔍 Git Analyzer Commands:")
+        print("- analyze repository")
+        print("- get code metrics <file>")
+        print("- detect smells")
+        print("- analyze contributors")
+        print("- get hotspots")
+        print("- generate report <analysis_id>")
+        print("\n💬 General Conversation:")
         print("- Type any message for general conversation")
         print("- Type 'quit' to exit\n")
         
@@ -152,4 +178,5 @@ class MCPChatbot:
         finally:
             # Clean up
             await self.mcp_client.close()
+            await self.git_analyzer_client.close()
     
