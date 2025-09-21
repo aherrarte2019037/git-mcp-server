@@ -105,17 +105,18 @@ class MCPChatbot:
     
     async def run_interactive(self):
         """Run interactive chatbot session"""
-        print("🤖 MCP Chatbot")
-        print("Available commands:")
+        print("📁 Filesystem MCP Commands:")
         print("- list files / ls")
         print("- read file <path>")
         print("- write file <path> <content>")
+        print("📚 Git MCP Commands:")
         print("- git status")
         print("- git add <files>")
         print("- git commit <message>")
         print("- git log")
         print("- git init")
         print("- git branch")
+        print("💬 General Conversation:")
         print("- Type any message for general conversation")
         print("- Type 'quit' to exit\n")
         
