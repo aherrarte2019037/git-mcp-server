@@ -1,5 +1,6 @@
 # Logs
 mcp_interactions.log
+.DS_Store
 
 # Environment variables
 .env
