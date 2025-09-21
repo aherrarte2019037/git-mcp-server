@@ -256,3 +256,80 @@ EJEMPLOS:
         except Exception as e:
             self.logger.error(f"Error detecting Git Analyzer intent with LLM: {e}")
             return None
+    
+    async def detect_weather_intent(self, message: str) -> Optional[Dict]:
+        """Detect Weather intent using LLM"""
+        try:
+            # Check for fixed commands first
+            message_lower = message.lower().strip()
+            
+            # Fixed command patterns for Weather
+            if message_lower.startswith("weather in "):
+                city = message[11:].strip()
+                return {"action": "weather", "city": city}
+            elif message_lower.startswith("clima en "):
+                city = message[9:].strip()
+                return {"action": "weather", "city": city}
+            elif message_lower.startswith("forecast in "):
+                city = message[12:].strip()
+                return {"action": "forecast", "city": city, "days": 3}
+            elif message_lower.startswith("pronóstico en "):
+                city = message[14:].strip()
+                return {"action": "forecast", "city": city, "days": 3}
+            elif message_lower.startswith("weather alerts in "):
+                city = message[18:].strip()
+                return {"action": "alerts", "city": city}
+            elif message_lower.startswith("alertas en "):
+                city = message[11:].strip()
+                return {"action": "alerts", "city": city}
+            
+            # Create a system prompt for Weather intent detection
+            system_prompt = """Eres un detector de intenciones para operaciones de clima. Tu única función es detectar si un mensaje del usuario solicita información del clima y devolver un JSON específico.
+
+HERRAMIENTAS DISPONIBLES:
+- get_weather: Obtener clima actual de una ciudad
+- get_forecast: Obtener pronóstico del clima para los próximos días
+- get_weather_alerts: Obtener alertas meteorológicas para una ciudad
+
+INSTRUCCIONES:
+1. Analiza el mensaje del usuario
+2. Si solicita información del clima, devuelve JSON
+3. Si NO solicita información del clima, devuelve "null"
+4. NO des explicaciones, solo devuelve JSON o "null"
+
+FORMATO DE RESPUESTA:
+{
+  "action": "weather|forecast|alerts",
+  "city": "nombre de la ciudad",
+  "days": 3 (solo para forecast)
+}
+
+EJEMPLOS:
+- "¿qué clima hace en Madrid?" → {"action": "weather", "city": "Madrid"}
+- "clima en Barcelona" → {"action": "weather", "city": "Barcelona"}
+- "pronóstico para París" → {"action": "forecast", "city": "París", "days": 3}
+- "forecast for London 5 days" → {"action": "forecast", "city": "London", "days": 5}
+- "alertas meteorológicas en Sevilla" → {"action": "alerts", "city": "Sevilla"}
+- "weather alerts in New York" → {"action": "alerts", "city": "New York"}
+- "hola como estas" → null
+- "explica qué es Python" → null"""
+
+            # Send to LLM for intent detection
+            response = await self.anthropic_client.get_response(
+                f"{system_prompt}\n\nMensaje del usuario: {message}",
+                []
+            )
+            
+            # Parse JSON response
+            try:
+                intent = json.loads(response.strip())
+                if intent and isinstance(intent, dict) and "action" in intent:
+                    return intent
+            except json.JSONDecodeError:
+                pass
+            
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error detecting Weather intent with LLM: {e}")
+            return None

@@ -15,23 +15,27 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from mcp_servers.mcp_client import MCPClient
 from mcp_servers.git_analyzer_client import GitAnalyzerClient
+from mcp_servers.weather_remote_client import WeatherRemoteClient
 from chatbot.anthropic_client import AnthropicClient
 from chatbot.context_manager import ContextManager
 from chatbot.intent_detector import IntentDetector
 from chatbot.filesystem_executor import FilesystemExecutor
 from chatbot.git_executor import GitExecutor
 from chatbot.git_analyzer_executor import GitAnalyzerExecutor
+from chatbot.weather_executor import WeatherExecutor
 
 class MCPChatbot:
     def __init__(self):
         self.mcp_client = MCPClient()
         self.git_analyzer_client = GitAnalyzerClient()
+        self.weather_client = WeatherRemoteClient("https://git-mcp-server-production-a0cf.up.railway.app")
         self.anthropic_client = AnthropicClient()
         self.context_manager = ContextManager()
         self.intent_detector = IntentDetector(self.anthropic_client)
         self.filesystem_executor = FilesystemExecutor(self.mcp_client)
         self.git_executor = GitExecutor(self.mcp_client)
         self.git_analyzer_executor = GitAnalyzerExecutor(self.git_analyzer_client)
+        self.weather_executor = WeatherExecutor(self.weather_client)
         self.logger = self._setup_logging()
         
     def _setup_logging(self):
@@ -67,6 +71,12 @@ class MCPChatbot:
                 self.logger.error("Failed to start Git Analyzer server")
                 return False
             
+            # Test Weather server connection
+            weather_health = await self.weather_client.health_check()
+            if not weather_health["success"]:
+                self.logger.error("Failed to connect to Weather server")
+                return False
+            
             self.logger.info("MCP servers initialized successfully")
             return True
         except Exception as e:
@@ -82,7 +92,16 @@ class MCPChatbot:
             # Get context for AI
             context = self.context_manager.get_context()
             
-            # Check if message contains Git Analyzer intent using LLM (most specific first)
+            # Check if message contains Weather intent using LLM (most specific first)
+            weather_intent = await self.intent_detector.detect_weather_intent(user_message)
+            
+            if weather_intent:
+                response = await self.weather_executor.execute_weather_intent(weather_intent, user_message)
+                # Add Weather response to context
+                self.context_manager.add_message("assistant", response)
+                return response
+            
+            # Check if message contains Git Analyzer intent using LLM
             git_analyzer_intent = await self.intent_detector.detect_git_analyzer_intent(user_message)
             
             if git_analyzer_intent:
@@ -124,7 +143,11 @@ class MCPChatbot:
     
     async def run_interactive(self):
         """Run interactive chatbot session"""
-        print("📁 Filesystem MCP Commands:")
+        print("🌤️ Weather MCP Commands:")
+        print("- weather in <city>")
+        print("- forecast in <city>")
+        print("- weather alerts in <city>")
+        print("\n📁 Filesystem MCP Commands:")
         print("- list files / ls")
         print("- read file <path>")
         print("- write file <path> <content>")
@@ -179,4 +202,5 @@ class MCPChatbot:
             # Clean up
             await self.mcp_client.close()
             await self.git_analyzer_client.close()
+            await self.weather_client.close()
     
