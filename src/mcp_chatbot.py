@@ -18,6 +18,7 @@ from chatbot.anthropic_client import AnthropicClient
 from chatbot.context_manager import ContextManager
 from chatbot.intent_detector import IntentDetector
 from chatbot.filesystem_executor import FilesystemExecutor
+from chatbot.git_executor import GitExecutor
 
 class MCPChatbot:
     def __init__(self):
@@ -26,6 +27,7 @@ class MCPChatbot:
         self.context_manager = ContextManager()
         self.intent_detector = IntentDetector(self.anthropic_client)
         self.filesystem_executor = FilesystemExecutor(self.mcp_client)
+        self.git_executor = GitExecutor(self.mcp_client)
         self.logger = self._setup_logging()
         
     def _setup_logging(self):
@@ -41,7 +43,7 @@ class MCPChatbot:
         return logging.getLogger(__name__)
     
     async def initialize(self):
-        """Initialize MCP filesystem server"""
+        """Initialize MCP servers"""
         try:
             # Start filesystem server
             fs_success = await self.mcp_client.start_filesystem_server()
@@ -49,10 +51,16 @@ class MCPChatbot:
                 self.logger.error("Failed to start filesystem server")
                 return False
             
-            self.logger.info("MCP filesystem server initialized successfully")
+            # Start Git server
+            git_success = await self.mcp_client.start_git_server()
+            if not git_success:
+                self.logger.error("Failed to start Git server")
+                return False
+            
+            self.logger.info("MCP servers initialized successfully")
             return True
         except Exception as e:
-            self.logger.error(f"Failed to initialize MCP server: {e}")
+            self.logger.error(f"Failed to initialize MCP servers: {e}")
             return False
     
     async def process_message(self, user_message: str) -> str:
@@ -73,6 +81,15 @@ class MCPChatbot:
                 self.context_manager.add_message("assistant", response)
                 return response
             
+            # Check if message contains Git intent using LLM
+            git_intent = await self.intent_detector.detect_git_intent(user_message)
+            
+            if git_intent:
+                response = await self.git_executor.execute_git_intent(git_intent, user_message)
+                # Add Git response to context
+                self.context_manager.add_message("assistant", response)
+                return response
+            
             # Send to Anthropic for general conversation
             response = await self.anthropic_client.get_response(user_message, context)
             
@@ -88,17 +105,23 @@ class MCPChatbot:
     
     async def run_interactive(self):
         """Run interactive chatbot session"""
-        print("🤖 MCP Filesystem")
+        print("🤖 MCP Chatbot")
         print("Available commands:")
         print("- list files / ls")
         print("- read file <path>")
         print("- write file <path> <content>")
+        print("- git status")
+        print("- git add <files>")
+        print("- git commit <message>")
+        print("- git log")
+        print("- git init")
+        print("- git branch")
         print("- Type any message for general conversation")
         print("- Type 'quit' to exit\n")
         
-        # Initialize MCP filesystem server
+        # Initialize MCP servers
         if not await self.initialize():
-            print("❌ Failed to initialize MCP filesystem server")
+            print("❌ Failed to initialize MCP servers")
             return
                 
         try:

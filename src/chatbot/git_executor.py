@@ -1,10 +1,8 @@
 """
-Git Executor for Direct Git Operations
-Executes Git intents using direct Git commands
+Git Executor for MCP Operations
+Executes Git intents detected by the IntentDetector
 """
 import logging
-import subprocess
-import os
 from typing import Dict
 
 class GitExecutor:
