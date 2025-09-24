@@ -190,6 +190,18 @@ class MCPClient:
         self.logger.info(f"MCP filesystem response: {result}")
         return result
     
+    async def filesystem_create_directory(self, path: str) -> Dict[str, Any]:
+        """Create directory using MCP filesystem server"""
+        self.logger.info(f"MCP filesystem operation: create_directory - path: {path}")
+        result = await self._send_mcp_request("tools/call", {
+            "name": "create_directory",
+            "arguments": {
+                "path": path
+            }
+        })
+        self.logger.info(f"MCP filesystem response: {result}")
+        return result
+    
     # Git operations
     async def git_status(self, repo_path: str = ".") -> Dict[str, Any]:
         """Get Git status"""

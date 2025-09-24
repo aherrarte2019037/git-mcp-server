@@ -29,6 +29,12 @@ class IntentDetector:
                     file_path = parts[0]
                     content = parts[1] if len(parts) > 1 else "Hello from MCP!"
                     return {"action": "write", "path": file_path, "content": content}
+            elif message_lower.startswith("create directory "):
+                dir_path = message[17:].strip()
+                return {"action": "create_directory", "path": dir_path}
+            elif message_lower.startswith("mkdir "):
+                dir_path = message[6:].strip()
+                return {"action": "create_directory", "path": dir_path}
             
             # Create a system prompt for intent detection
             system_prompt = """Eres un detector de intenciones para operaciones de archivos. Tu única función es detectar si un mensaje del usuario solicita una operación de archivos y devolver un JSON específico.
@@ -37,18 +43,28 @@ HERRAMIENTAS DISPONIBLES:
 - list_directory: Listar archivos en un directorio
 - read_file: Leer el contenido de un archivo  
 - write_file: Crear o escribir en un archivo
+- create_directory: Crear un directorio
+
+OPERACIONES NO DISPONIBLES (detectar como "unsupported"):
+- modificar, editar, actualizar, cambiar archivos
+- eliminar, remover archivos
+- mover, renombrar, copiar archivos
+- crear directorios, cambiar permisos
+- buscar archivos o texto
 
 INSTRUCCIONES:
 1. Analiza el mensaje del usuario
-2. Si solicita operaciones de archivos, devuelve JSON
-3. Si NO solicita operaciones de archivos, devuelve "null"
-4. NO des explicaciones, solo devuelve JSON o "null"
+2. Si solicita operaciones de archivos DISPONIBLES, devuelve JSON
+3. Si solicita operaciones NO DISPONIBLES, devuelve {"action": "unsupported", "operation": "descripción"}
+4. Si NO solicita operaciones de archivos, devuelve "null"
+5. NO des explicaciones, solo devuelve JSON o "null"
 
 FORMATO DE RESPUESTA:
 {
-  "action": "list|read|write",
+  "action": "list|read|write|create_directory|unsupported",
   "path": "ruta/del/archivo/o/directorio", 
-  "content": "contenido solo para write"
+  "content": "contenido solo para write",
+  "operation": "descripción de la operación no disponible"
 }
 
 EJEMPLOS:
@@ -56,6 +72,12 @@ EJEMPLOS:
 - "qué archivos hay" → {"action": "list", "path": "."}
 - "lee README.md" → {"action": "read", "path": "README.md"}
 - "crea test.txt con hola" → {"action": "write", "path": "test.txt", "content": "hola"}
+- "crea directorio docs" → {"action": "create_directory", "path": "docs"}
+- "crear carpeta nueva" → {"action": "create_directory", "path": "nueva"}
+- "mkdir src" → {"action": "create_directory", "path": "src"}
+- "modifica el archivo" → {"action": "unsupported", "operation": "modificar archivo"}
+- "elimina test.txt" → {"action": "unsupported", "operation": "eliminar archivo"}
+- "renombra archivo.txt" → {"action": "unsupported", "operation": "renombrar archivo"}
 - "hola como estas" → null
 - "explica qué es Python" → null"""
 
